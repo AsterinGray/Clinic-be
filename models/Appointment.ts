@@ -10,16 +10,16 @@ const AppointmentSchema = new Schema<Appointment>({
     type: String,
     required: true,
   },
+  capacity: {
+    type: Number,
+    required: true,
+  },
   registrants: [
     {
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
   ],
-  capacity: {
-    type: Number,
-    required: true,
-  },
 })
 
 const AppointmentModel = model<Appointment>('Appointment', AppointmentSchema)

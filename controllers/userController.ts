@@ -48,3 +48,34 @@ export const login = async (
     res.status(401).json({ message: 'Authentication failed' })
   }
 }
+
+export const getRole = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (
+    req.headers &&
+    req.headers.authorization &&
+    req.headers.authorization.split(' ')[0] === 'Bearer'
+  ) {
+    try {
+      const decoded: any = jwt.verify(
+        req.headers.authorization.split(' ')[1],
+        'JWT'
+      )
+
+      if (decoded.role === 'Patient') {
+        return res.status(201).json({ role: 'Patient' })
+      } else if (decoded.role === 'Administrator') {
+        return res.status(201).json({ role: 'Administrator' })
+      } else {
+        return res.status(401).json({ message: 'Unauthorized user' })
+      }
+    } catch (error) {
+      return res.status(401).json({ message: 'Unauthorized user' })
+    }
+  } else {
+    return res.status(401).json({ message: 'Unauthorized user' })
+  }
+}
