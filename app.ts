@@ -1,12 +1,8 @@
-import express, { Response } from 'express'
+import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
-import jwt from 'jsonwebtoken'
 
 import routes from './routes'
-import { authMiddleware } from './middlewares'
-import { RequestWithUser } from './types'
-import { NextFunction } from 'express-serve-static-core'
 
 const app = express()
 
@@ -23,4 +19,4 @@ app.use(cors())
 app.use(express.json())
 app.use('/', routes)
 
-app.listen(8000)
+app.listen(4000)

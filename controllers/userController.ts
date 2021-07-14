@@ -35,7 +35,8 @@ export const login = async (
 
       if (isPasswordMatch) {
         return res.status(200).json({
-          token: jwt.sign({}, 'JWT'),
+          data: user,
+          token: jwt.sign({ id: user.id, role: user.role }, 'JWT'),
         })
       } else {
         return res.status(401).json({
