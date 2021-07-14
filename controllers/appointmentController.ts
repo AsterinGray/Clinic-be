@@ -69,6 +69,7 @@ export const applyAppointment = async (req: Request, res: Response) => {
             { $push: { registrants: decoded.id } },
             { upsert: true, new: true }
           )
+          appointment.capacity -= 1
           return res.status(200).json(apply)
         } else {
           return res.status(401).json({ message: 'Capacity is full' })
@@ -102,6 +103,7 @@ export const cancelAppointment = async (req: Request, res: Response) => {
           new: true,
         })
 
+        appointment.capacity += 1
         return res.status(200).json(cancel)
       }
     } else {
