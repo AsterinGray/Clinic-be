@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import AppointmentModel from '../models/Appointment'
+import jwt from 'jsonwebtoken'
 
 export const getAppointment = async (req: Request, res: Response) => {
   try {
@@ -49,27 +50,32 @@ export const createAppointment = async (req: Request, res: Response) => {
 
 export const applyAppointment = async (req: Request, res: Response) => {
   const appointment = await AppointmentModel.findById(req.params.id)
+  let decoded: any
+
+  if (
+    req.headers &&
+    req.headers.authorization &&
+    req.headers.authorization.split(' ')[0] === 'Bearer'
+  ) {
+    decoded = jwt.verify(req.headers.authorization.split(' ')[1], 'JWT')
+  }
 
   if (appointment) {
     if (appointment.registrants) {
-      const registrant = appointment.registrants.filter((r) => {
-        return r._id === req.body.user._id
-      })
-
-      if (!registrant) {
+      if (!appointment.registrants.some((r) => r._id === decoded.id)) {
         if (appointment.registrants.length < appointment.capacity) {
           const apply = await AppointmentModel.findByIdAndUpdate(
             req.params.id,
-            { $push: { registrants: req.body.user._id } },
+            { $push: { registrants: decoded.id } },
             { upsert: true, new: true }
           )
-          res.status(200).json(apply)
+          return res.status(200).json(apply)
         } else {
           return res.status(401).json({ message: 'Capacity is full' })
         }
       }
     } else {
-      return res.status(404).json({ message: 'Appointment has no registrant' })
+      return res.status(404).json({ message: 'You have apply' })
     }
   } else {
     return res.status(404).json({ message: 'Appointment not found' })
@@ -78,23 +84,28 @@ export const applyAppointment = async (req: Request, res: Response) => {
 
 export const cancelAppointment = async (req: Request, res: Response) => {
   const appointment = await AppointmentModel.findById(req.params.id)
+  let decoded: any
+
+  if (
+    req.headers &&
+    req.headers.authorization &&
+    req.headers.authorization.split(' ')[0] === 'Bearer'
+  ) {
+    decoded = jwt.verify(req.headers.authorization.split(' ')[1], 'JWT')
+  }
 
   if (appointment) {
     if (appointment.registrants) {
-      const registrant = appointment.registrants.filter((r) => {
-        return r._id === req.body.user._id
-      })
-      if (registrant) {
+      if (!appointment.registrants.some((r) => r._id === decoded.id)) {
         const cancel = await AppointmentModel.findByIdAndDelete(req.params.id, {
           upsert: true,
           new: true,
         })
-        res.status(200).json(cancel)
-      } else {
-        res.status(401).json({ message: 'User not registered' })
+
+        return res.status(200).json(cancel)
       }
     } else {
-      return res.status(404).json({ message: 'Appointment has no registrant' })
+      return res.status(404).json({ message: 'You have not apply' })
     }
   } else {
     return res.status(404).json({ message: 'Appointment not found' })

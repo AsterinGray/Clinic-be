@@ -26,7 +26,7 @@ router.patch('/appointment/:id', isAdmin, updateAppointment)
 router.delete('/appointment/:id', isAdmin, deleteAppointment)
 router.get('/appointment/:id/registrant', isAdmin, getRegistrantsInAppointment)
 
-router.post('/appointment/:id/apply', isPatient, applyAppointment)
-router.post('/appointment/:id/cancel', isPatient, cancelAppointment)
+router.get('/appointment/:id/apply', isPatient, applyAppointment)
+router.get('/appointment/:id/cancel', isPatient, cancelAppointment)
 
 export default router

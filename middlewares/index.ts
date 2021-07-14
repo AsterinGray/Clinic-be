@@ -1,7 +1,5 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import jwt_decode from 'jwt-decode'
-import UserModel from '../models/User'
 import { RequestWithUser } from '../types'
 
 export const isAdmin = async (
@@ -19,7 +17,7 @@ export const isAdmin = async (
         req.headers.authorization.split(' ')[1],
         'JWT'
       )
-      console.log(decoded)
+
       if (decoded.role === 'Administrator') {
         next()
       } else {
